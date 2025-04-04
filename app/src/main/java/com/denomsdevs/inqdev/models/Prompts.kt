@@ -7,5 +7,4 @@ data class Prompts(
     val error: Boolean,
     val prompt: String,
     val response: String,
-    val message: String?
 )
