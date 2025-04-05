@@ -1,6 +1,8 @@
 package com.denomsdevs.inqdev
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -21,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +31,10 @@ import androidx.compose.ui.unit.sp
 import com.denomsdevs.inqdev.models.Prompts
 import com.denomsdevs.inqdev.models.promptItems
 import com.denomsdevs.inqdev.ui.theme.InqdevTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,17 +49,43 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun MainScreen() {
+    val context = LocalContext.current
     val promptText = remember { mutableStateOf("") }
     val textShow = remember { mutableStateOf(false) }
+    val processing = remember { mutableStateOf(false) }
     val iconVal = when (textShow.value){
         false -> Icons.Rounded.KeyboardArrowUp
         true -> Icons.Rounded.KeyboardArrowRight
     }
 
-    Box(modifier = Modifier.fillMaxSize()){
+    fun promptHandler(context: Context){
+        if (textShow.value){
+            if (promptText.value.isEmpty()){
+                Toast.makeText(
+                    context,
+                    "Prompt Text is Empty",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+            // show loading ui & prevent new text processing
+            processing.value = true
+            // Process the prompt text
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(3000)
+                // Clear text-field
+                promptText.value = ""
+                textShow.value = !textShow.value
+                processing.value = false
+            }
+        } else {
+            textShow.value = !textShow.value
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxHeight()
@@ -66,11 +99,15 @@ fun MainScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { /*TODO*/ }) {
-                        Image(modifier = Modifier.size(28.dp), imageVector = Icons.Filled.Settings, contentDescription = "settings")
+                        Image(
+                            modifier = Modifier.size(28.dp),
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "settings"
+                        )
                     }
                 }
             }
-            item{
+            item {
                 Spacer(modifier = Modifier.height(2.dp))
             }
             item {
@@ -87,46 +124,61 @@ fun MainScreen() {
                     )
                 }
             }
-            items(promptItems){
-                prompt -> PromptItem(item = prompt)
+            items(promptItems) { prompt ->
+                PromptItem(item = prompt)
             }
-            item{
+            item {
                 Spacer(modifier = Modifier.height(40.dp))
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomEnd)
-                .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ){
-            if (textShow.value){
-                OutlinedTextField(
-                    value = promptText.value,
-                    onValueChange = { txt -> promptText.value = txt },
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .weight(0.8F),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        backgroundColor = Color.Black,
-                        textColor = Color.White
-                    ),
-                    placeholder = { Text("Prompt here..", color = Color.White ) }
-                )
-            } else {
-                Spacer(modifier = Modifier.size(20.dp))
-            }
-            Surface(
+        if (processing.value) {
+            Row (
                 modifier = Modifier
-                    .size(64.dp)
-                    .padding(8.dp),
-                shape = CircleShape,
-                color = Color.Black,
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            )
+            {
+                CircularProgressIndicator(color = Color.Black)
+            }
+        }
+        else{
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
             ) {
-                IconButton(onClick = { textShow.value = !textShow.value }) {
-                    Icon(imageVector = iconVal, contentDescription = "Code", tint = Color.White)
+                if (textShow.value) {
+                    OutlinedTextField(
+                        value = promptText.value,
+                        onValueChange = { txt -> promptText.value = txt },
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .weight(0.8F),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            backgroundColor = Color.Black,
+                            textColor = Color.White
+                        ),
+                        placeholder = { Text("Prompt here..", color = Color.White) }
+                    )
+                } else {
+                    Spacer(modifier = Modifier.size(20.dp))
+                }
+                Surface(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .padding(8.dp),
+                    shape = CircleShape,
+                    color = Color.Black,
+                ) {
+                    IconButton(onClick = { promptHandler(context) }) {
+                        Icon(imageVector = iconVal, contentDescription = "Code", tint = Color.White)
+                    }
                 }
             }
         }
