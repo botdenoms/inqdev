@@ -1,16 +1,11 @@
 package com.denomsdevs.inqdev.models
 
-import java.util.*
-
 val promptItems = listOf(
-    Prompts(Date(1566246), false, "Messages Count", "56 Messages found"),
-    Prompts(Date(251566246), false, "Apps installed", "206 apps found"),
-    Prompts(Date(156826246), true, "Contacts Count",  "Permission Denied!"),
-    Prompts(Date(1565636246), false, "Is External storage there", "Yes"),
-    Prompts(Date(1566246), false, "Messages Count", "56 Messages found"),
-    Prompts(Date(251566246), false, "Apps installed", "206 apps found"),
-    Prompts(Date(156826246), true, "Contacts Count",  "Permission Denied!"),
-    Prompts(Date(1566246), false, "Messages Count", "56 Messages found"),
-    Prompts(Date(251566246), false, "Apps installed", "206 apps found"),
-    Prompts(Date(156826246), true, "Contacts Count",  "Permission Denied!")
+    Prompt(123, 2515662412, false, "Messages Count", "56 Messages found"),
+    Prompt(124, 251566246, false, "Apps installed", "206 apps found"),
+    Prompt(125, 156826246, true, "Contacts Count",  "Permission Denied!"),
+    Prompt(126, 1565636246, false, "Is External storage there", "Yes"),
+    Prompt(129, 156826246, true, "Contacts Count",  "Permission Denied!"),
+    Prompt(130, 1566246, false, "Messages Count", "56 Messages found"),
+    Prompt(131, 156826246, true, "Contacts Count",  "Permission Denied!")
 )

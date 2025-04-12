@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "prompts")
-data class Prompts(
+class Prompt (
     @PrimaryKey
     @ColumnInfo(name = "p_id")
     val id: Long,
@@ -18,4 +18,3 @@ data class Prompts(
     @ColumnInfo(name = "p_response")
     val response: String
 )
-
