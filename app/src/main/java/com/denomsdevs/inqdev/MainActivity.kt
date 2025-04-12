@@ -28,13 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.denomsdevs.inqdev.models.Prompts
-import com.denomsdevs.inqdev.models.promptItems
+import com.denomsdevs.inqdev.models.Prompt
 import com.denomsdevs.inqdev.ui.theme.InqdevTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
+    val promptsViewModel = PromptViewModel()
     val context = LocalContext.current
     val promptText = remember { mutableStateOf("") }
     val textShow = remember { mutableStateOf(false) }
@@ -59,6 +60,7 @@ fun MainScreen() {
         false -> Icons.Rounded.KeyboardArrowUp
         true -> Icons.Rounded.KeyboardArrowRight
     }
+    promptsViewModel.getPrompts()
 
     fun promptHandler(context: Context){
         if (textShow.value){
@@ -124,8 +126,43 @@ fun MainScreen() {
                     )
                 }
             }
-            items(promptItems) { prompt ->
-                PromptItem(item = prompt)
+            if (promptsViewModel.fetching.value){
+                item{
+                    Column (
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )
+                    {
+                        Spacer(modifier = Modifier.height(80.dp))
+                        CircularProgressIndicator(color = Color.Black)
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+                }
+            }
+            else {
+                if (promptsViewModel.prompts.value.isEmpty()){
+                    item {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.SpaceBetween,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Spacer(modifier = Modifier.height(80.dp))
+                            Text(
+                                "No Prompts found!\n\tTry adding one",
+                                fontSize = 14.sp,
+                                color = Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                    }
+                }
+                else{
+                    items(promptsViewModel.prompts.value) { prompt ->
+                        PromptItem(item = prompt)
+                    }
+                }
             }
             item {
                 Spacer(modifier = Modifier.height(40.dp))
@@ -186,7 +223,7 @@ fun MainScreen() {
 }
 
 @Composable
-fun PromptItem(item: Prompts){
+fun PromptItem(item: Prompt){
     val expanded = remember {
         mutableStateOf(false)
     }
@@ -202,6 +239,7 @@ fun PromptItem(item: Prompts){
         false -> Icons.Rounded.KeyboardArrowDown
         true -> Icons.Rounded.KeyboardArrowUp
     }
+    val date = Date(item.date)
 
 
     Surface(
@@ -210,7 +248,7 @@ fun PromptItem(item: Prompts){
         modifier = Modifier.padding(4.dp)
     ) {
         Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)) {
-            Text(item.date.toString(), fontSize = 14.sp, color = Color.White )
+            Text(date.toString(), fontSize = 14.sp, color = Color.White )
             Spacer(modifier = Modifier.height(5.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
