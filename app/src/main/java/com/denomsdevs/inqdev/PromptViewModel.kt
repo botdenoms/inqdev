@@ -31,12 +31,38 @@ class PromptViewModel : ViewModel() {
     fun getPrompts() {
         fetching.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            // val items = getPromptsPersisted()
-            val items = getPromptsFake()
+            val items = getPromptsPersisted()
+            // val items = getPromptsFake()
             withContext(Dispatchers.Main){
                 prompts.value = items
                 fetching.value = false
             }
         }
     }
+
+    fun addPrompt(prompt: Prompt){
+        viewModelScope.launch(Dispatchers.IO) {
+            // val items = getPromptsPersisted()
+            addPromptsPersisted(listOf(prompt))
+        }
+        getPrompts()
+    }
+
+    fun addPrompts(prompts: List<Prompt>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // val items = getPromptsPersisted()
+            addPromptsPersisted(prompts)
+        }
+        getPrompts()
+    }
+
+    fun deletePrompt(prompt: Prompt){
+        viewModelScope.launch(Dispatchers.IO) {
+            promptsDao.deletePrompt(prompt)
+            getPrompts()
+        }
+    }
+
+    fun editPrompt(){}
+
 }
