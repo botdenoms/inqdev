@@ -11,4 +11,7 @@ interface PromptsDao {
 
     @Query("SELECT * FROM prompts")
     fun getAll(): List<Prompt>
+
+    @Delete()
+    fun deletePrompt(prompt: Prompt)
 }
