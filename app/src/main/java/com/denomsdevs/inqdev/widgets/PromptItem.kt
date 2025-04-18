@@ -24,7 +24,11 @@ import com.denomsdevs.inqdev.models.Prompt
 import java.util.Date
 
 @Composable
-fun PromptItem(item: Prompt){
+fun PromptItem(
+    item: Prompt,
+    deleteHandler: (Prompt) -> Unit
+)
+{
     val expanded = remember {
         mutableStateOf(false)
     }
@@ -79,7 +83,7 @@ fun PromptItem(item: Prompt){
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ){
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { deleteHandler(item) }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Drop down",

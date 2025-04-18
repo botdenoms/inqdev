@@ -114,7 +114,9 @@ fun MainScreen() {
                 }
                 else{
                     items(promptsViewModel.prompts.value) { prompt ->
-                        PromptItem(item = prompt)
+                        PromptItem(
+                            item = prompt
+                        ) { prompt -> promptsViewModel.deletePrompt(prompt) }
                     }
                 }
             }
@@ -124,7 +126,8 @@ fun MainScreen() {
         }
         PromptActionTab(
             context = context,
-            modifier = Modifier.align(Alignment.BottomEnd)
+            modifier = Modifier.align(Alignment.BottomEnd),
+            model = promptsViewModel
         )
     }
 }

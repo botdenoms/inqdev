@@ -15,15 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.denomsdevs.inqdev.PromptViewModel
+import com.denomsdevs.inqdev.models.Prompt
+
 
 @Composable
 fun PromptActionTab(
     context: Context,
-    modifier: Modifier
+    modifier: Modifier,
+    model: PromptViewModel
 ){
     val promptText = remember { mutableStateOf("") }
     val textShow = remember { mutableStateOf(false) }
@@ -35,7 +35,7 @@ fun PromptActionTab(
 
     fun promptHandler(context: Context){
         if (textShow.value){
-            if (promptText.value.isEmpty()){
+            if (promptText.value.isEmpty()) {
                 Toast.makeText(
                     context,
                     "Prompt Text is Empty",
@@ -43,16 +43,40 @@ fun PromptActionTab(
                 ).show()
                 return
             }
+            // Process the prompt text
+            if (promptText.value.length < 8) {
+                Toast.makeText(
+                    context,
+                    "Prompt Text is not a valid command",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
             // show loading ui & prevent new text processing
             processing.value = true
-            // Process the prompt text
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(3000)
+            // Run the prompt Entered
+            // pass the prompt text to the compiler background service
+            // wait for response from the services
+            val resp = Prompt(
+                id = System.currentTimeMillis(),
+                date = System.currentTimeMillis(),
+                prompt = promptText.value,
+                error = true,
+                response = "Compiling Services Not yet Developed"
+            )
+            // add response to the list of prompts
+            model.addPrompt(resp)
+            // Clear text-field
+            promptText.value = ""
+            textShow.value = !textShow.value
+            processing.value = false
+            // CoroutineScope(Dispatchers.Main).launch {
+                // delay(1000)
                 // Clear text-field
-                promptText.value = ""
-                textShow.value = !textShow.value
-                processing.value = false
-            }
+                //promptText.value = ""
+                //textShow.value = !textShow.value
+                //processing.value = false
+            //}
         }
         else {
             textShow.value = !textShow.value
