@@ -20,11 +20,11 @@ class PromptViewModel : ViewModel() {
          return promptItems
     }
 
-    private suspend fun getPromptsPersisted():List<Prompt>{
+    private fun getPromptsPersisted():List<Prompt>{
         return promptsDao.getAll()
     }
 
-    private suspend fun addPromptsPersisted(prompts: List<Prompt>){
+    private fun addPromptsPersisted(prompts: List<Prompt>){
         return promptsDao.addAll(prompts)
     }
 
@@ -44,16 +44,8 @@ class PromptViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             // val items = getPromptsPersisted()
             addPromptsPersisted(listOf(prompt))
+            getPrompts()
         }
-        getPrompts()
-    }
-
-    fun addPrompts(prompts: List<Prompt>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            // val items = getPromptsPersisted()
-            addPromptsPersisted(prompts)
-        }
-        getPrompts()
     }
 
     fun deletePrompt(prompt: Prompt){
