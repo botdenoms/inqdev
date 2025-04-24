@@ -45,6 +45,8 @@ fun PromptItem(
         true -> Icons.Rounded.KeyboardArrowUp
     }
     val date = Date(item.date)
+    val pred = date.toString().substring(0, date.toString().length - 14)
+    val yr = date.toString().substring(date.toString().length - 5)
 
 
     Surface(
@@ -53,7 +55,7 @@ fun PromptItem(
         modifier = Modifier.padding(4.dp)
     ) {
         Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)) {
-            Text(date.toString(), fontSize = 14.sp, color = Color.White )
+            Text("$pred$yr", fontSize = 14.sp, color = Color.White )
             Spacer(modifier = Modifier.height(5.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
