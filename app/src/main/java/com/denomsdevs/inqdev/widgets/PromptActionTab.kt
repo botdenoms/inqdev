@@ -16,7 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.denomsdevs.inqdev.PromptViewModel
-import com.denomsdevs.inqdev.models.Prompt
+import com.denomsdevs.inqdev.domain.Interpreter
+import com.denomsdevs.inqdev.domain.Parser
 
 
 @Composable
@@ -54,29 +55,36 @@ fun PromptActionTab(
             }
             // show loading ui & prevent new text processing
             processing.value = true
-            // Run the prompt Entered
-            // pass the prompt text to the compiler background service
-            // wait for response from the services
-            val resp = Prompt(
-                id = System.currentTimeMillis(),
-                date = System.currentTimeMillis(),
-                prompt = promptText.value,
-                error = true,
-                response = "Compiling Services Not yet Developed"
-            )
-            // add response to the list of prompts
-            model.addPrompt(resp)
-            // Clear text-field
-            promptText.value = ""
-            textShow.value = !textShow.value
-            processing.value = false
-            // CoroutineScope(Dispatchers.Main).launch {
+            // pass the prompt text to the parser
+            val parser = Parser(promptText.value)
+            if (parser.isValid()) {
+                // Run the prompt Entered by the interpreter
+                val interpreter = Interpreter(parser)
+                // wait for response from the interpreter
+                val resp =  interpreter.execute()
+                // add response to the list of prompts
+                model.addPrompt(resp)
+                // Clear text-field
+                promptText.value = ""
+                textShow.value = !textShow.value
+                processing.value = false
+                // CoroutineScope(Dispatchers.Main).launch {
                 // delay(1000)
                 // Clear text-field
                 //promptText.value = ""
                 //textShow.value = !textShow.value
                 //processing.value = false
-            //}
+                //}
+            }
+            else {
+                Toast.makeText(
+                    context,
+                    "Prompt Text is not a valid command",
+                    Toast.LENGTH_SHORT
+                ).show()
+                processing.value = false
+                return
+            }
         }
         else {
             textShow.value = !textShow.value
