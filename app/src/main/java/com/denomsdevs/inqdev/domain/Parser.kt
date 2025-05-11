@@ -1,5 +1,7 @@
 package com.denomsdevs.inqdev.domain
 
+import android.Manifest
+
 class Parser(val prompt: String) {
     private var tokens: List<String> = prompt.split(" ")
     private var promptTree: MutableMap<String, String> = mutableMapOf()
@@ -120,10 +122,10 @@ class Parser(val prompt: String) {
         // return the Permission required for the target
         val perms = emptyList<String>().toMutableList()
         when (getTarget()){
-            Target.APPS -> perms.add("READ")
-            Target.SMS -> TODO()
-            Target.CONTACTS -> TODO()
-            Target.STORAGE -> TODO()
+            Target.APPS -> perms.add(Manifest.permission.INSTALL_PACKAGES)
+            Target.SMS -> perms.add(Manifest.permission.READ_SMS)
+            Target.CONTACTS -> perms.add(Manifest.permission.READ_CONTACTS)
+            Target.STORAGE -> perms.add(Manifest.permission.READ_EXTERNAL_STORAGE)
             Target.EMAIL -> TODO()
             Target.NULL -> TODO()
         }
