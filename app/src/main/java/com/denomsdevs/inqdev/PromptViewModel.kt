@@ -32,9 +32,10 @@ class PromptViewModel : ViewModel() {
         fetching.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val items = getPromptsPersisted()
+            // items.sortedByDescending { it.date }
             // val items = getPromptsFake()
             withContext(Dispatchers.Main){
-                prompts.value = items
+                prompts.value = items.sortedByDescending { it.date }
                 fetching.value = false
             }
         }
