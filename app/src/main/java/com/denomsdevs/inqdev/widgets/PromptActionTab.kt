@@ -2,6 +2,8 @@ package com.denomsdevs.inqdev.widgets
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -18,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.denomsdevs.inqdev.PromptViewModel
 import com.denomsdevs.inqdev.domain.Interpreter
 import com.denomsdevs.inqdev.domain.Parser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -32,6 +37,13 @@ fun PromptActionTab(
     val iconVal = when (textShow.value){
         false -> Icons.Rounded.KeyboardArrowUp
         true -> Icons.Rounded.KeyboardArrowRight
+    }
+    val permGranted = remember { mutableStateOf(false) }
+
+    val permsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ){
+        permMap -> permGranted.value = permMap.values.all { it }
     }
 
     fun promptHandler(context: Context){
@@ -59,22 +71,21 @@ fun PromptActionTab(
             val parser = Parser(promptText.value)
             if (parser.isValid()) {
                 // Run the prompt Entered by the interpreter
-                val interpreter = Interpreter(parser)
+                val interpreter = Interpreter(
+                    parser,
+                    context,
+                    permsLauncher,
+                )
                 // wait for response from the interpreter
-                val resp =  interpreter.execute()
-                // add response to the list of prompts
-                model.addPrompt(resp)
-                // Clear text-field
-                promptText.value = ""
-                textShow.value = !textShow.value
-                processing.value = false
-                // CoroutineScope(Dispatchers.Main).launch {
-                // delay(1000)
-                // Clear text-field
-                //promptText.value = ""
-                //textShow.value = !textShow.value
-                //processing.value = false
-                //}
+                CoroutineScope(Dispatchers.Main).launch {
+                    val resp =  interpreter.execute()
+                    // add response to the list of prompts
+                    model.addPrompt(resp)
+                    // Clear text-field
+                    promptText.value = ""
+                    textShow.value = !textShow.value
+                    processing.value = false
+                }
             }
             else {
                 Toast.makeText(

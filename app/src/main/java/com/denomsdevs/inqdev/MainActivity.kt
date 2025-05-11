@@ -116,7 +116,7 @@ fun MainScreen() {
                     items(promptsViewModel.prompts.value) { prompt ->
                         PromptItem(
                             item = prompt
-                        ) { prompt -> promptsViewModel.deletePrompt(prompt) }
+                        ) { item -> promptsViewModel.deletePrompt(item) }
                     }
                 }
             }
